@@ -6,6 +6,8 @@
     <title>Invoice Generator - Hotel Jomsom Pride</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             background-color: #f8f9fa;
@@ -63,11 +65,13 @@
                     <img src="logo.png" alt="Hotel Jomsom Pride Logo" class="logo">
                 </div>
                 <h1 class="hotel-name">Hotel Jomsom Pride</h1>
-                <h5 class="pan">PAN no:- 12345678987654 </h5>
+                <h5 class="pan">PAN no:- 12345678987654</h5>
                 <div class="hotel-address">
-                  <div class="hotel-address">
                     <p>Jomsom, Mustang, Nepal</p>
                     <p>Tel: +977-9857650503, 977-9851185865, 069590083 | Email: pridejomsom@gmail.com</p>
+                </div>
+                <h2 class="invoice-title">INVOICE</h2>
+            </div>
 
             <!-- Recipient and Date Input -->
             <div class="row mb-4">
@@ -82,7 +86,7 @@
                 <div class="col-md-6">
                     <label for="invoice-date" class="form-label">Invoice Date</label>
                     <input type="date" id="invoice-date" class="form-control">
-                    <label for="discount-amount" class="form-label">Discount Amount (रु)</label>
+                    <label for="discount-amount" class="form-label">Discount Amount</label>
                     <input type="number" id="discount-amount" class="form-control" placeholder="Enter discount amount" min="0">
                 </div>
             </div>
@@ -98,7 +102,7 @@
                     <input type="number" id="item-quantity" class="form-control" placeholder="Qty" min="1">
                 </div>
                 <div class="col-md-3">
-                    <label for="item-price" class="form-label">Unit Price (रु)</label>
+                    <label for="item-price" class="form-label">Unit Price</label>
                     <input type="number" id="item-price" class="form-control" placeholder="Price" min="0">
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
@@ -112,8 +116,8 @@
                     <tr>
                         <th>Item</th>
                         <th>Quantity</th>
-                        <th>Unit Price (रु)</th>
-                        <th>Total (रु)</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -124,9 +128,9 @@
 
             <!-- Total Section -->
             <div class="total-section">
-                <p>Subtotal: रु <span id="subtotal">0</span></p>
-                <p>Discount: रु <span id="discount">0</span></p>
-                <p>Grand Total: रु <span id="grand-total">0</span></p>
+                <p>Subtotal: <span id="subtotal">0</span></p>
+                <p>Discount: <span id="discount">0</span></p>
+                <p>Grand Total: <span id="grand-total">0</span></p>
             </div>
 
             <!-- Footer -->
@@ -146,8 +150,6 @@
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-    <!-- jsPDF for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         const { jsPDF } = window.jspdf;
 
@@ -179,8 +181,8 @@
                 <tr>
                     <td>${item.itemName}</td>
                     <td>${item.itemQuantity}</td>
-                    <td>रु ${item.itemPrice.toFixed(2)}</td>
-                    <td>रु ${item.total.toFixed(2)}</td>
+                    <td>${item.itemPrice.toFixed(2)}</td>
+                    <td>${item.total.toFixed(2)}</td>
                     <td><button class="btn btn-danger btn-sm" onclick="removeItem(${index})">Remove</button></td>
                 </tr>
             `).join('');
@@ -197,6 +199,10 @@
         function calculateTotals() {
             const subtotal = items.reduce((sum, item) => sum + item.total, 0);
             const discount = parseFloat(document.getElementById('discount-amount').value) || 0;
+            if (discount > subtotal) {
+                alert('Discount amount cannot be greater than subtotal.');
+                return;
+            }
             const grandTotal = subtotal - discount;
 
             document.getElementById('subtotal').textContent = subtotal.toFixed(2);
@@ -213,12 +219,20 @@
 
         // Generate PDF
         function generatePDF() {
-            const doc = createPDF();
-            doc.save('invoice-hotel-jomsom-pride.pdf');
+            console.log("Generating PDF...");
+            try {
+                const doc = createPDF();
+                doc.save('invoice-hotel-jomsom-pride.pdf');
+                console.log("PDF generated successfully.");
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+                alert("Failed to generate PDF. Please check the console for details.");
+            }
         }
 
         // Create PDF content
         function createPDF() {
+            console.log("Creating PDF content...");
             const doc = new jsPDF();
 
             // Add logo
@@ -266,8 +280,8 @@
             doc.rect(10, 100, 190, 10, "F");
             doc.text("Item", 15, 106);
             doc.text("Quantity", 80, 106);
-            doc.text("Unit Price (रु)", 120, 106);
-            doc.text("Total (रु)", 160, 106);
+            doc.text("Unit Price", 120, 106); // Removed currency unit
+            doc.text("Total", 160, 106); // Removed currency unit
 
             // Add items to the PDF
             let yPos = 120;
@@ -275,8 +289,8 @@
                 doc.setTextColor(0, 0, 0); // Black
                 doc.text(item.itemName, 15, yPos);
                 doc.text(item.itemQuantity.toString(), 80, yPos);
-                doc.text(`रु ${item.itemPrice.toFixed(2)}`, 120, yPos);
-                doc.text(`रु ${item.total.toFixed(2)}`, 160, yPos);
+                doc.text(item.itemPrice.toFixed(2), 120, yPos); // Removed currency unit
+                doc.text(item.total.toFixed(2), 160, yPos); // Removed currency unit
                 yPos += 10;
             });
 
@@ -287,9 +301,15 @@
 
             doc.setTextColor(44, 62, 80); // Dark blue
             doc.setFont("helvetica", "bold");
-            doc.text(`Subtotal: रु ${subtotal.toFixed(2)}`, 10, yPos + 10);
-            doc.text(`Discount: रु ${discount.toFixed(2)}`, 10, yPos + 20);
-            doc.text(`Grand Total: रु ${grandTotal.toFixed(2)}`, 10, yPos + 30);
+            doc.text(`Subtotal: ${subtotal.toFixed(2)}`, 10, yPos + 10); // Removed currency unit
+            doc.text(`Discount: ${discount.toFixed(2)}`, 10, yPos + 20); // Removed currency unit
+            doc.text(`Grand Total: ${grandTotal.toFixed(2)}`, 10, yPos + 30); // Removed currency unit
+
+            // Add footer
+            doc.setFontSize(10);
+            doc.setTextColor(127, 140, 141); // Gray
+            doc.text("Thank you for choosing Hotel Jomsom Pride!", 10, doc.internal.pageSize.height - 20);
+            doc.text("Terms & Conditions apply", 10, doc.internal.pageSize.height - 15);
 
             return doc;
         }
@@ -303,8 +323,8 @@
             }
 
             // Validate phone number format
-            if (!recipientPhone.startsWith('+')) {
-                alert('Please enter the phone number in international format (e.g., +977123456789).');
+            if (!/^\+\d{10,15}$/.test(recipientPhone)) {
+                alert('Please enter a valid phone number in international format (e.g., +977123456789).');
                 return;
             }
 
@@ -323,11 +343,15 @@
                     method: 'POST',
                     body: formData,
                 });
+                if (!response.ok) throw new Error('Failed to upload PDF.');
                 const result = await response.json();
                 const pdfUrl = result.data.url;
 
                 // Create WhatsApp message
-                const message = `Hello, here is your invoice from Hotel Jomsom Pride: ${pdfUrl}`;
+                const message = `Hello, here is your invoice from Hotel Jomsom Pride:
+Recipient: ${document.getElementById('recipient-name').value}
+Total Amount: ${document.getElementById('grand-total').textContent}
+PDF: ${pdfUrl}`;
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappUrl = `https://wa.me/${recipientPhone}?text=${encodedMessage}`;
 
