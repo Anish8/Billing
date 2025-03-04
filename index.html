@@ -12,11 +12,10 @@
             padding: 20px;
         }
         .invoice-container {
-            background: #ffffff;
+            background: rgb(248, 247, 247);
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            border: 1px solid #dee2e6;
         }
         .header {
             text-align: center;
@@ -52,13 +51,6 @@
             color: #7f8c8d;
             font-size: 14px;
         }
-        .table th, .table td {
-            vertical-align: middle;
-        }
-        .table thead th {
-            background-color: #2c3e50;
-            color: #ffffff;
-        }
     </style>
 </head>
 <body>
@@ -71,12 +63,11 @@
                     <img src="logo.png" alt="Hotel Jomsom Pride Logo" class="logo">
                 </div>
                 <h1 class="hotel-name">Hotel Jomsom Pride</h1>
-                <h5 class="pan">PAN no:- 127861973 </h5>
+                <h5 class="pan">PAN no:- 12345678987654 </h5>
                 <div class="hotel-address">
+                  <div class="hotel-address">
                     <p>Jomsom, Mustang, Nepal</p>
                     <p>Tel: +977-9857650503, 977-9851185865, 069590083 | Email: pridejomsom@gmail.com</p>
-                </div>
-            </div>
 
             <!-- Recipient and Date Input -->
             <div class="row mb-4">
@@ -244,12 +235,13 @@
             doc.setTextColor(127, 140, 141); // Gray
             doc.setFont("helvetica", "normal");
             doc.text("Jomsom, Mustang, Nepal", 70, 28);
-            doc.text("Tel: +977-9857650503, 9851185865, 069590083| Email: pridejomsom@gmail.com", 70, 36);
+            doc.text("Tel: +977-9857650503, 9851185865 | Email: pridejomsom@gmail.com", 70, 36);
 
             // Add invoice title
             doc.setFontSize(16);
             doc.setTextColor(231, 76, 60); // Red
             doc.setFont("helvetica", "bold");
+            doc.text("INVOICE", 10, 50);
 
             // Add recipient details
             const recipientName = document.getElementById('recipient-name').value;
@@ -274,8 +266,8 @@
             doc.rect(10, 100, 190, 10, "F");
             doc.text("Item", 15, 106);
             doc.text("Quantity", 80, 106);
-            doc.text("Unit Price", 120, 106);
-            doc.text("Total", 160, 106);
+            doc.text("Unit Price (रु)", 120, 106);
+            doc.text("Total (रु)", 160, 106);
 
             // Add items to the PDF
             let yPos = 120;
