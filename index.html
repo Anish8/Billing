@@ -243,14 +243,13 @@
             doc.setFontSize(12);
             doc.setTextColor(127, 140, 141); // Gray
             doc.setFont("helvetica", "normal");
-            doc.text("Main Street, Jomsom, Mustang, Nepal", 70, 28);
-            doc.text("Tel: +977-123-456789 | Email: info@jomsompride.com", 70, 36);
+            doc.text("Jomsom, Mustang, Nepal", 70, 28);
+            doc.text("Tel: +977-9857650503, 9851185865, 069590083| Email: pridejomsom@gmail.com", 70, 36);
 
             // Add invoice title
             doc.setFontSize(16);
             doc.setTextColor(231, 76, 60); // Red
             doc.setFont("helvetica", "bold");
-            doc.text("INVOICE", 10, 50);
 
             // Add recipient details
             const recipientName = document.getElementById('recipient-name').value;
@@ -295,7 +294,7 @@
             const grandTotal = subtotal - discount;
 
             doc.setTextColor(44, 62, 80); // Dark blue
-            doc.setFont("times", "bold");
+            doc.setFont("helvetica", "bold");
             doc.text(`Subtotal: रु ${subtotal.toFixed(2)}`, 10, yPos + 10);
             doc.text(`Discount: रु ${discount.toFixed(2)}`, 10, yPos + 20);
             doc.text(`Grand Total: रु ${grandTotal.toFixed(2)}`, 10, yPos + 30);
